@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Task Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .input-section {
+            padding: 30px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .task-input-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .task-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e1e8ed;
+            border-radius: 50px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .task-input:focus {
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .add-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .add-btn:active {
+            transform: translateY(0);
+        }
+
+        .tasks-section {
+            padding: 0 30px 30px;
+        }
+
+        .task-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 15px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .task-list {
+            list-style: none;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            margin-bottom: 15px;
+            background: white;
+            border: 2px solid #e1e8ed;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover {
+            border-color: #4facfe;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-item.completed {
+            background: #f1f5f9;
+            border-color: #10b981;
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #cbd5e1;
+            border-radius: 50%;
+            margin-right: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .task-checkbox.checked {
+            background: #10b981;
+            border-color: #10b981;
+        }
+
+        .task-checkbox.checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .task-text {
+            flex: 1;
+            font-size: 16px;
+            line-height: 1.5;
+            transition: all 0.3s ease;
+        }
+
+        .task-text.completed {
+            text-decoration: line-through;
+            color: #64748b;
+        }
+
+        .task-text.editing {
+            background: #f1f5f9;
+            border: 2px solid #4facfe;
+            border-radius: 8px;
+            padding: 8px 12px;
+            outline: none;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .task-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn {
+            background: #fbbf24;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background: #f59e0b;
+            transform: translateY(-1px);
+        }
+
+        .delete-btn {
+            background: #ef4444;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        .save-btn {
+            background: #10b981;
+            color: white;
+        }
+
+        .save-btn:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .cancel-btn {
+            background: #6b7280;
+            color: white;
+        }
+
+        .cancel-btn:hover {
+            background: #4b5563;
+            transform: translateY(-1px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-state-text {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state-subtext {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+                min-height: 100vh;
+            }
+
+            .task-input-container {
+                flex-direction: column;
+            }
+
+            .add-btn {
+                width: 100%;
+            }
+
+            .input-section, .tasks-section {
+                padding: 20px;
+            }
+
+            .task-stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .task-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .task-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>My Task Manager</h1>
+        </div>
+        
+        <div class="input-section">
+            <div class="task-input-container">
+                <input type="text" class="task-input" id="taskInput" placeholder="What needs to be done?">
+                <button class="add-btn" id="addBtn">Add Task</button>
+            </div>
+        </div>
+
+        <div class="tasks-section">
+            <div class="task-stats">
+                <div class="stat">
+                    <div class="stat-number" id="totalTasks">0</div>
+                    <div class="stat-label">Total</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="completedTasks">0</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="pendingTasks">0</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+            </div>
+            
+            <ul class="task-list" id="taskList">
+            </ul>
+            
+            <div class="empty-state" id="emptyState">
+                <div class="empty-state-icon">📝</div>
+                <div class="empty-state-text">No tasks yet!</div>
+                <div class="empty-state-subtext">Add your first task above to get started</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class TaskManager {
+            constructor() {
+                this.tasks = [];
+                this.editingTaskId = null;
+                this.taskIdCounter = 0;
+                
+                this.taskInput = document.getElementById('taskInput');
+                this.addBtn = document.getElementById('addBtn');
+                this.taskList = document.getElementById('taskList');
+                this.emptyState = document.getElementById('emptyState');
+                this.totalTasksEl = document.getElementById('totalTasks');
+                this.completedTasksEl = document.getElementById('completedTasks');
+                this.pendingTasksEl = document.getElementById('pendingTasks');
+
+                this.loadTasks();
+                this.bindEvents();
+                this.render();
+            }
+
+            loadTasks() {
+                try {
+                    const savedTasks = localStorage.getItem('taskManagerTasks');
+                    if (savedTasks) {
+                        this.tasks = JSON.parse(savedTasks);
+                        this.taskIdCounter = Math.max(...this.tasks.map(t => t.id), 0) + 1;
+                    }
+                } catch (error) {
+                    console.log('localStorage not available, using in-memory storage');
+                    this.tasks = [];
+                }
+            }
+
+            saveTasks() {
+                try {
+                    localStorage.setItem('taskManagerTasks', JSON.stringify(this.tasks));
+                } catch (error) {
+                    console.log('localStorage not available, changes won\'t persist');
+                }
+            }
+
+            bindEvents() {
+                this.addBtn.addEventListener('click', () => this.addTask());
+                this.taskInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.addTask();
+                    }
+                });
+            }
+
+            addTask() {
+                const text = this.taskInput.value.trim();
+                if (!text) return;
+
+                const task = {
+                    id: this.taskIdCounter++,
+                    text: text,
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                };
+
+                this.tasks.unshift(task);
+                this.taskInput.value = '';
+                this.saveTasks();
+                this.render();
+            }
+
+            toggleTask(id) {
+                const task = this.tasks.find(t => t.id === id);
+                if (task) {
+                    task.completed = !task.completed;
+                    this.saveTasks();
+                    this.render();
+                }
+            }
+
+            deleteTask(id) {
+                this.tasks = this.tasks.filter(t => t.id !== id);
+                this.saveTasks();
+                this.render();
+            }
+
+            editTask(id) {
+                if (this.editingTaskId !== null) {
+                    this.cancelEdit();
+                }
+                this.editingTaskId = id;
+                this.render();
+            }
+
+            saveEdit(id, newText) {
+                const text = newText.trim();
+                if (!text) return;
+
+                const task = this.tasks.find(t => t.id === id);
+                if (task) {
+                    task.text = text;
+                    this.editingTaskId = null;
+                    this.saveTasks();
+                    this.render();
+                }
+            }
+
+            cancelEdit() {
+                this.editingTaskId = null;
+                this.render();
+            }
+
+            updateStats() {
+                const total = this.tasks.length;
+                const completed = this.tasks.filter(t => t.completed).length;
+                const pending = total - completed;
+
+                this.totalTasksEl.textContent = total;
+                this.completedTasksEl.textContent = completed;
+                this.pendingTasksEl.textContent = pending;
+            }
+
+            createTaskElement(task) {
+                const li = document.createElement('li');
+                li.className = `task-item ${task.completed ? 'completed' : ''}`;
+
+                const isEditing = this.editingTaskId === task.id;
+
+                li.innerHTML = `
+                    <div class="task-checkbox ${task.completed ? 'checked' : ''}" 
+                         onclick="taskManager.toggleTask(${task.id})"></div>
+                    ${isEditing ? 
+                        `<input type="text" class="task-text editing" value="${task.text}" 
+                                onkeypress="if(event.key==='Enter') taskManager.saveEdit(${task.id}, this.value)"
+                                onblur="taskManager.saveEdit(${task.id}, this.value)" 
+                                id="editInput${task.id}">` :
+                        `<span class="task-text ${task.completed ? 'completed' : ''}">${task.text}</span>`
+                    }
+                    <div class="task-actions">
+                        ${isEditing ? 
+                            `<button class="task-btn save-btn" onclick="taskManager.saveEdit(${task.id}, document.getElementById('editInput${task.id}').value)">Save</button>
+                             <button class="task-btn cancel-btn" onclick="taskManager.cancelEdit()">Cancel</button>` :
+                            `<button class="task-btn edit-btn" onclick="taskManager.editTask(${task.id})">Edit</button>
+                             <button class="task-btn delete-btn" onclick="taskManager.deleteTask(${task.id})">Delete</button>`
+                        }
+                    </div>
+                `;
+
+                return li;
+            }
+
+            render() {
+                // Clear task list
+                this.taskList.innerHTML = '';
+
+                // Show/hide empty state
+                if (this.tasks.length === 0) {
+                    this.emptyState.style.display = 'block';
+                } else {
+                    this.emptyState.style.display = 'none';
+                    
+                    // Render tasks
+                    this.tasks.forEach(task => {
+                        const taskElement = this.createTaskElement(task);
+                        this.taskList.appendChild(taskElement);
+                    });
+
+                    // Focus edit input if editing
+                    if (this.editingTaskId !== null) {
+                        const editInput = document.getElementById(`editInput${this.editingTaskId}`);
+                        if (editInput) {
+                            editInput.focus();
+                            editInput.select();
+                        }
+                    }
+                }
+
+                // Update stats
+                this.updateStats();
+            }
+        }
+
+        // Initialize the task manager
+        const taskManager = new TaskManager();
+    </script>
+</body>
+</html>
